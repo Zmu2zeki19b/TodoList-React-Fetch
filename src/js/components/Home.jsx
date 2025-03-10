@@ -1,28 +1,70 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
-//include images into your bundle
-import rigoImage from "../../img/rigo-baby.jpg";
+const API_URL = "https://playground.4geeks.com/todo/todos/tu_usuario";
 
-//create your first component
 const Home = () => {
-	return (
-		<div className="text-center">
-            
+  const [tasks, setTasks] = useState([]);
 
-			<h1 className="text-center mt-5">Hello Rigo!</h1>
-			<p>
-				<img src={rigoImage} />
-			</p>
-			<a href="#" className="btn btn-success">
-				If you see this green button... bootstrap is working...
-			</a>
-			<p>
-				Made by{" "}
-				<a href="http://www.4geeksacademy.com">4Geeks Academy</a>, with
-				love!
-			</p>
-		</div>
-	);
+  // Cargar tareas al inicio
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setTasks(data);
+        }
+      })
+      .catch((err) => console.error("Error al obtener tareas:", err));
+  }, []);
+
+  // Agregar una nueva tarea
+  const addTask = (taskLabel) => {
+    const newTasks = [...tasks, { label: taskLabel, done: false }];
+    updateTasks(newTasks);
+  };
+
+  // Eliminar una tarea
+  const deleteTask = (index) => {
+    const newTasks = tasks.filter((_, i) => i !== index);
+    updateTasks(newTasks);
+  };
+
+  // Limpiar todas las tareas
+  const clearTasks = () => {
+    updateTasks([]);
+  };
+
+  // Función para actualizar tareas en el servidor
+  const updateTasks = (newTasks) => {
+    fetch(API_URL, {
+      method: "PUT",
+      body: JSON.stringify(newTasks),
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => res.json())
+      .then(() => setTasks(newTasks))
+      .catch((err) => console.error("Error al actualizar tareas:", err));
+  };
+
+  return (
+    <div>
+      <h1>To-Do List</h1>
+      <input
+        type="text"
+        placeholder="Nueva tarea"
+        onKeyDown={(e) => e.key === "Enter" && addTask(e.target.value)}
+      />
+      <ul>
+        {tasks.map((task, index) => (
+          <li key={index}>
+            {task.label}
+            <button onClick={() => deleteTask(index)}>❌</button>
+          </li>
+        ))}
+      </ul>
+      <button onClick={clearTasks}>Limpiar Todo</button>
+    </div>
+  );
 };
 
 export default Home;
