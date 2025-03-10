@@ -5,7 +5,6 @@ const API_URL = "https://playground.4geeks.com/todo/todos/tu_usuario";
 const Home = () => {
   const [tasks, setTasks] = useState([]);
 
-  // Cargar tareas al inicio
   useEffect(() => {
     fetch(API_URL)
       .then((res) => res.json())
@@ -17,24 +16,20 @@ const Home = () => {
       .catch((err) => console.error("Error al obtener tareas:", err));
   }, []);
 
-  // Agregar una nueva tarea
   const addTask = (taskLabel) => {
     const newTasks = [...tasks, { label: taskLabel, done: false }];
     updateTasks(newTasks);
   };
 
-  // Eliminar una tarea
   const deleteTask = (index) => {
     const newTasks = tasks.filter((_, i) => i !== index);
     updateTasks(newTasks);
   };
 
-  // Limpiar todas las tareas
   const clearTasks = () => {
     updateTasks([]);
   };
 
-  // Función para actualizar tareas en el servidor
   const updateTasks = (newTasks) => {
     fetch(API_URL, {
       method: "PUT",
